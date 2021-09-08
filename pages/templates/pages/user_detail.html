@@ -1,0 +1,33 @@
+{% extends 'pages/_base.html' %}
+
+{% block title %}{{ person.username | title }}{% endblock title %}
+
+{% block content %}
+<h1>{{ person.username | title }}</h1>
+{% if follow %}
+    <form method="post">
+        {% csrf_token %}
+        <button class="btn btn-primary" style="border-radius: 25px" type="submit">Follow</button>
+    </form>
+{% else %}
+    <a class="btn btn-danger" style="border-radius: 25px" href="{% url 'user_unfollow' person.pk %}">Unfollow</a>
+{% endif %}
+<hr>
+{% if person.tweets.all %}
+    {% for tweet in person.tweets.all reversed %}
+        <div class="card text-black mt-3" style="background-color: #DCDEE0">
+            <div class="card-header">
+                {{ tweet.date | timesince }} ago
+            </div>
+            <div class="card-body">
+                <p>{{ tweet.content }}</p>
+            </div>
+            <div class="card-footer">
+                <a class="btn btn-primary mt-2" style="border-radius: 25px" href="{% url 'tweet_detail' tweet.pk %}">See comments</a>
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <p>This user doesn't have any posts</p>
+{% endif %}
+{% endblock content %}

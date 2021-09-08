@@ -1,0 +1,24 @@
+{% extends 'pages/_base.html' %}
+
+{% block title %}Search Results{% endblock title %}
+
+{% block content %}
+<h1>Search Results</h1>
+<div class="row row-cols-1 row-cols-md-2 g-4">
+    {% for person in object_list %}
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                    {% if person.pk != user.pk %}
+                        <h5><a href="{% url 'user_detail' person.pk %}" class="card-title">{{ person.username }}</a></h5>
+                    {% else %}
+                        <h5><a href="{% url 'myProfile_detail' person.pk %}" class="card-title">{{ person.username }}</a></h5>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <p>No users found</p>
+    {% endfor %}
+</div>
+{% endblock content %}

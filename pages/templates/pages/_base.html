@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}Base{% endblock title %}</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+    </head>
+    <body>
+        <nav class="navbar navbar-light bg-light">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="{% url 'home' %}">Twitter Clone</a>
+                <form class="d-flex" action="{% url 'search_results' %}" method="GET">
+                    <input name="q" class="form-control me-2" type="text" placeholder="User search" aria-label="Search">
+                    <button class="btn btn-outline-success" type="submit">Search</button>
+                </form>
+                {% if user.is_authenticated %}
+                    <form class="justify-content-end">
+                        <span class="navbar-text me-2">Hello {{ user.username | title }}!</span>
+                        <a class="btn btn-primary me-2" href="{% url 'myProfile_detail' user.pk %}">My profile</a>
+                        <a class="btn btn-danger" href="{% url 'account_logout' %}">Log Out</a>
+                    </form>
+                {% else %}
+                    <form class="justify-content-end">
+                        <a class="btn btn-primary" href="{% url 'account_login' %}">Log In</a>
+                        <a class="btn btn-secondary" href="{% url 'account_signup' %}">Sign Up</a>
+                    </form>
+                {% endif %}
+            </div>
+        </nav>
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    {% block column_one %}
+                    {% endblock column_one %}
+                </div>
+                <div class="col-6">
+                    {% block content %}
+                    {% endblock content %}
+                </div>
+                <div class="col">
+                    {% block column_three %}
+                    {% endblock column_three %}
+                </div>
+            </div>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
+    </body>
+</html>

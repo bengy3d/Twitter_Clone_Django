@@ -1,0 +1,36 @@
+{% extends 'pages/_base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Tweet{% endblock title %}
+
+{% block content %}
+<h2>Tweet</h2>
+<div class="card text-black mt-2" style="background-color: #DCDEE0">
+    <div class="card-header">
+        <a href="{% url 'user_detail' tweet.author.pk %}">{{ tweet.author }}</a> | {{ tweet.date }}
+    </div>
+    <div class="card-body">
+        <p>{{ tweet.content }}</p>
+    </div>
+</div>
+<form class="mt-3" method="post">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <button class="btn btn-primary mt-2" style="border-radius: 25px" type="submit">Reply</button>
+</form>
+<h4 class="mt-2">All Comments</h4>
+{% if tweet.comments.all %}
+    {% for comment in tweet.comments.all reversed %}
+        <div class="card text-white bg-secondary mt-2">
+            <div class="card-header">
+                {{ comment.author }} | {{ comment.date }}
+            </div>
+            <div class="card-body">
+                <p>{{ comment.comment }}</p>
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <p>This tweet doesn't have any comments yet.</p>
+{% endif %}
+{% endblock content %}

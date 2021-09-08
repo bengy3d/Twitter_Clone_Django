@@ -1,0 +1,11 @@
+{% extends 'pages/_base.html' %}
+
+{% block content %}
+    <h1>Unfollow</h1>
+    <form action="" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <p>Are you sure you want to unfollow "{{ person.username }}"?</p>
+        <button class="btn btn-danger" style="border-radius: 25px" type="submit">Unfollow</button>
+    </form>
+{% endblock content %}
