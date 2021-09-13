@@ -18,7 +18,7 @@
                 {% if user.is_authenticated %}
                     <form class="d-flex">
                         <span class="navbar-text me-2">Hello {{ user.username | title }}!</span>
-                        <a class="btn btn-primary me-2" href="{% url 'my_profile_detail' user.pk %}">My profile</a>
+                        <a class="btn btn-primary me-2" href="{% url 'my_profile_detail' %}">My profile</a>
                         <a class="btn btn-danger" href="{% url 'account_logout' %}">Log Out</a>
                     </form>
                 {% else %}

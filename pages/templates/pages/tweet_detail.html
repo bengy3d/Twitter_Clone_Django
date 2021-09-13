@@ -7,10 +7,31 @@
 <h2>Tweet</h2>
 <div class="card text-black mt-2" style="background-color: #DCDEE0">
     <div class="card-header">
-        <a href="{% url 'user_detail' tweet.author.pk %}">{{ tweet.author }}</a> | {{ tweet.date }}
+        {% if tweet.author != user%}
+            <a href="{% url 'user_detail' tweet.author.pk %}">{{ tweet.author }}</a> | {{ tweet.date | timesince }} ago
+        {% else %}
+            <a href="{% url 'my_profile_detail'%}">{{ tweet.author }}</a> | {{ tweet.date | timesince }} ago
+            <a class="link-danger" href="{% url 'tweet_delete' tweet.pk %}">Delete</a>
+        {% endif %}
     </div>
     <div class="card-body">
         <p>{{ tweet.content }}</p>
+    </div>
+    <div class="card-footer">
+        <p>Likes: {{ tweet.likes.all.count }}</p>
+        {% if liked %}
+            <form class="d-inline-block" action="{% url 'unlike_tweet' tweet.pk %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.path }}">
+                <button class="btn btn-danger" style="border-radius: 25px" name="tweet_id" value="{{ tweet.id }}" type="submit">Unlike</button>
+            </form>
+        {% else %}
+            <form class="d-inline-block" action="{% url 'like_tweet' tweet.pk %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.path }}">
+                <button class="btn btn-primary" style="border-radius: 25px" name="tweet_id" value="{{ tweet.id }}" type="submit">Like</button>
+            </form>
+        {% endif %}
     </div>
 </div>
 <form class="mt-3" method="post">
@@ -19,18 +40,18 @@
     <button class="btn btn-primary mt-2" style="border-radius: 25px" type="submit">Reply</button>
 </form>
 <h4 class="mt-2">All Comments</h4>
-{% if tweet.comments.all %}
-    {% for comment in tweet.comments.all reversed %}
-        <div class="card text-white bg-secondary mt-2">
-            <div class="card-header">
-                {{ comment.author }} | {{ comment.date }}
-            </div>
-            <div class="card-body">
-                <p>{{ comment.comment }}</p>
-            </div>
-        </div>
-    {% endfor %}
-{% else %}
+{% if not tweet.comments.all %}
     <p>This tweet doesn't have any comments yet.</p>
 {% endif %}
+{% for comment in tweet.comments.all reversed %}
+    <div class="card text-white bg-secondary mt-2">
+        <div class="card-header">
+            {{ comment.author }} | {{ comment.date }}
+        </div>
+        <div class="card-body">
+            <p>{{ comment.comment }}</p>
+        </div>
+    </div>
+{% endfor %}
+
 {% endblock content %}

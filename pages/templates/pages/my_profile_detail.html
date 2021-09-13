@@ -11,21 +11,40 @@
     {{ form|crispy }}
     <button class="btn btn-primary mt-2" style="border-radius: 25px" type="submit">Tweet</button>
 </form>
-{% if person.tweets.all %}
-    {% for tweet in person.tweets.all reversed %}
-        <div class="card text-black mt-3" style="background-color: #DCDEE0">
-            <div class="card-header">
-                {{ tweet.date | timesince }} ago
-            </div>
-            <div class="card-body">
-                <p>{{ tweet.content }}</p>
-            </div>
-            <div class="card-footer">
-                <a class="btn btn-primary mt-2" style="border-radius: 25px" href="{% url 'tweet_detail' tweet.pk %}">See comments</a>
-            </div>
-        </div>
-    {% endfor %}
-{% else %}
+
+{% if not person.tweets.all %}
     <p>You don't have any tweets yet.</p>
 {% endif %}
+
+{% for tweet in person.tweets.all reversed %}
+    <div class="card text-black mt-3" id="{{ tweet.pk }}" style="background-color: #DCDEE0">
+        <div class="card-header">
+            {{ tweet.date | timesince }} ago 
+            <a class="link-danger" href="{% url 'tweet_delete' tweet.pk %}">Delete</a>
+        </div>
+        <div class="card-body">
+            <p>{{ tweet.content }}</p>
+        </div>
+        <div class="card-footer">
+            <p>Likes: {{ tweet.likes.all.count }}</p>
+            {% for key, value in is_liked.items %}
+                {% if key == tweet.pk and not value %}
+                    <form class="d-inline-block" action="{% url 'like_tweet' tweet.pk %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{{ request.path }}">
+                        <button class="btn btn-primary" style="border-radius: 25px" name="tweet_id" value="{{ tweet.id }}" type="submit">Like</button>
+                    </form>
+                {% elif key == tweet.pk and value %}
+                    <form class="d-inline-block" action="{% url 'unlike_tweet' tweet.pk %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{{ request.path }}">
+                        <button class="btn btn-danger" style="border-radius: 25px" name="tweet_id" value="{{ tweet.id }}" type="submit">Unlike</button>
+                    </form>
+                {% endif %}
+            {% endfor %}
+            <a class="btn btn-primary" style="border-radius: 25px" href="{% url 'tweet_detail' tweet.pk %}">See comments</a>
+        </div>
+    </div>
+{% endfor %}
+
 {% endblock content %}

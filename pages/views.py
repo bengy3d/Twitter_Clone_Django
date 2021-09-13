@@ -1,22 +1,32 @@
-from django.db.models.query import QuerySet
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView, DetailView, FormView, DeleteView
+from django.views.generic import (
+    ListView, DetailView, FormView, DeleteView, TemplateView
+)
 from django.views import View
 from django.views.generic.detail import SingleObjectMixin
 from django.contrib.auth import get_user_model
 from django.db.models import Q
-from django.urls import reverse
-from django.http import HttpResponseRedirect
+from django.urls import reverse, reverse_lazy
+from django.http import HttpResponseRedirect, Http404
 
 from tweets.models import Tweet, UserFollowing
 from .forms import CommentForm, TweetForm, FollowForm
 
 userModel = get_user_model()
 
+
+# Landing page view
+class LandingPageView(TemplateView):
+    template_name = 'pages/landing_page.html'
+    
+    def get(self, request, *args, **kwargs):
+        if self.request.user.is_authenticated:
+            return HttpResponseRedirect(reverse('home'))
+        return super().get(request, *args, **kwargs)
 # Homepage View
 # GET
-class TweetListDisplay(ListView):
+class TweetListDisplay(LoginRequiredMixin, ListView):
     model = Tweet
     context_object_name = 'tweet'
     template_name = 'pages/home.html'
@@ -57,8 +67,7 @@ class TweetFormView(FormView):
         return super().form_valid(form)
     
     def get_success_url(self):
-        return reverse('my_profile_detail', 
-                       kwargs={'pk': self.request.user.pk})
+        return reverse('home') + '#new_post'
     
 class TweetListView(View):
 
@@ -79,6 +88,11 @@ class TweetDisplay(DetailView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        my_profile = userModel.objects.get(username=self.request.user)
+        liked = False
+        if self.object in my_profile.tweet_likes.all():
+            liked = True
+        context['liked'] = liked
         context['form'] = CommentForm()
         return context
 # POST    
@@ -117,6 +131,20 @@ class TweetDetailView(LoginRequiredMixin, View):
         view = TweetComment.as_view()
         return view(request, *args, **kwargs)
 
+class TweetDeleteView(LoginRequiredMixin, DeleteView):
+    model = Tweet
+    template_name = 'pages/tweet_delete.html'
+    success_url = reverse_lazy('my_profile_detail')
+    
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if self.object.author == request.user:
+            return super(TweetDeleteView, self).delete(request, *args, 
+                                                       **kwargs)
+        else:
+            raise(Http404('permission denied'))
+    
+
 # Search results list View
 class SearchResultsListView(LoginRequiredMixin, ListView):
     model = userModel
@@ -137,8 +165,19 @@ class MyProfileDisplay(DetailView):
     context_object_name = 'person'
     template_name = 'pages/my_profile_detail.html'
     
+    def get_object(self):
+        return self.request.user
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        my_profile = userModel.objects.get(username=self.request.user)
+        is_liked = {}
+        for tweet in my_profile.tweets.all():
+            if tweet in my_profile.tweet_likes.all():
+                is_liked[tweet.pk] = True
+            else:
+                is_liked[tweet.pk] = False
+        context['is_liked'] = is_liked
         context['form'] = TweetForm()
         return context
 
@@ -151,14 +190,13 @@ class MyProfileTweetFormView(FormView):
         return super().post(request, *args, **kwargs)
     
     def form_valid(self, form):
-        my_profile = userModel.objects.get(username=self.request.user)
         tweet = form.save(commit=False)
         tweet.author = self.request.user
         tweet.save()
         return super().form_valid(form)
     
     def get_success_url(self):
-        return reverse('my_profile_detail', kwargs={'pk': self.request.user.pk}) + '#new_post'
+        return reverse('my_profile_detail') + '#new_post'
        
 class MyProfileDetailView(LoginRequiredMixin, DetailView):
     
@@ -192,6 +230,13 @@ class UserDisplay(DetailView):
                 follow = False
         print(follow)
         context['follow'] = follow
+        is_liked = {}
+        for tweet in view_user.tweets.all():
+            if tweet in my_profile.tweet_likes.all():
+                is_liked[tweet.pk] = True
+            else:
+                is_liked[tweet.pk] = False
+        context['is_liked'] = is_liked
         return context
 
 class UserFollowFormView(SingleObjectMixin, FormView):
@@ -259,10 +304,12 @@ class UserUnfollowView(LoginRequiredMixin, FormView):
     
 def like_tweet(request, pk):
     tweet = get_object_or_404(Tweet, id=request.POST.get('tweet_id'))
+    next = request.POST.get('next', '/')
     tweet.likes.add(request.user)
-    return HttpResponseRedirect(reverse('home') + f'#{tweet.pk}')
+    return HttpResponseRedirect(next + f'#{tweet.pk}')
 
 def unlike_tweet(request, pk):
     tweet = get_object_or_404(Tweet, id=request.POST.get('tweet_id'))
+    next = request.POST.get('next', '/')
     tweet.likes.remove(request.user)
-    return HttpResponseRedirect(reverse('home') + f'#{tweet.pk}') 
+    return HttpResponseRedirect(next + f'#{tweet.pk}') 
