@@ -17,6 +17,7 @@ class Tweet(models.Model):
         related_name='tweets',
         on_delete=models.CASCADE,
     )
+    likes = models.ManyToManyField(userModel, related_name='tweet_likes')
     date = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):

@@ -11,54 +11,41 @@
         <button class="btn btn-primary mt-2" style="border-radius: 25px" type="submit">Tweet</button>
     </form>
     <h2 class="mt-4">Followed tweets</h2>
-    {% if user.following.all %}
-        {% for tweet in object_list reversed %}
-            {% for follows in user.following.all %}
-                {% if tweet.author == follows.following_user_id %}
-                    <div class="card text-black mt-3" style="background-color: #DCDEE0">
-                        <div class="card-header">
-                            <a href="{% url 'user_detail' tweet.author.pk %}">{{ tweet.author }}</a> | {{ tweet.date | timesince }} ago
-                        </div>
-                        <div class="card-body">
-                            <p>{{ tweet.content }}</p>
-                        </div>
-                        <div class="card-footer">
-                            <a class="btn btn-primary mt-2" style="border-radius: 25px" href="{% url 'tweet_detail' tweet.pk %}">See comments</a>
-                        </div>
-                    </div>
-                {% elif tweet.author == user %}
-                    <div class="card text-black mt-3" style="background-color: #DCDEE0">
-                        <div class="card-header">
-                            <a href="{% url 'myProfile_detail' tweet.author.pk %}">{{ tweet.author }}</a> | {{ tweet.date | timesince }} ago
-                        </div>
-                        <div class="card-body">
-                            <p>{{ tweet.content }}</p>
-                        </div>
-                        <div class="card-footer">
-                            <a class="btn btn-primary mt-2" style="border-radius: 25px" href="{% url 'tweet_detail' tweet.pk %}">See comments</a>
-                        </div>
-                    </div>
-                {% endif %}
-            {% endfor %}
-        {% endfor %}
-    {% else %}
-        <p>You're not following anybody, use the search bar to find your friends.</p>
-        {% if user.tweets.all %}
-            {% for tweet in user.tweets.all %}
-                <div class="card text-black mt-3" style="background-color: #DCDEE0">
-                    <div class="card-header">
-                        <a href="{% url 'myProfile_detail' tweet.author.pk %}">{{ tweet.author }}</a> | {{ tweet.date | timesince }} ago
-                    </div>
-                    <div class="card-body">
-                        <p>{{ tweet.content }}</p>
-                    </div>
-                    <div class="card-footer">
-                        <a class="btn btn-primary mt-2" style="border-radius: 25px" href="{% url 'tweet_detail' tweet.pk %}">See comments</a>
-                    </div>
-                </div>
-            {% endfor %}
-        {% endif %}
+    {% if not user.following.all %}
+        <p>You're not following anybody, use the search bar to find your friends.<br/>
+            Only displaying your posts.</p>
     {% endif %}
+    {% for tweet in object_list reversed %}
+        <div class="card text-black mt-3" id="{{ tweet.pk }}" style="background-color: #DCDEE0">
+            <div class="card-header">
+                {% if tweet.author != user%}
+                    <a href="{% url 'user_detail' tweet.author.pk %}">{{ tweet.author }}</a> | {{ tweet.date | timesince }} ago
+                {% else %}
+                    <a href="{% url 'my_profile_detail' tweet.author.pk %}">{{ tweet.author }}</a> | {{ tweet.date | timesince }} ago
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <p>{{ tweet.content }}</p>
+            </div>
+            <div class="card-footer">
+                {% for key, value in is_liked.items %}
+                    {% if key == tweet.pk and not value %}
+                        <form class="d-inline-block" action="{% url 'like_tweet' tweet.pk %}" method="post">
+                            {% csrf_token %}
+                            <button class="btn btn-primary" name="tweet_id" value="{{ tweet.id }}" type="submit">Like</button>
+                        </form>
+                    {% elif key == tweet.pk and value %}
+                        <form class="d-inline-block" action="{% url 'unlike_tweet' tweet.pk %}" method="post">
+                            {% csrf_token %}
+                            <button class="btn btn-danger" name="tweet_id" value="{{ tweet.id }}" type="submit">Unlike</button>
+                        </form>
+                    {% endif %}
+                {% endfor %}
+                - {{ tweet.likes.all.count }}
+                <a class="btn btn-primary mt-2" style="border-radius: 25px" href="{% url 'tweet_detail' tweet.pk %}">See comments</a>
+            </div>
+        </div>
+    {% endfor %}
 {% else %}
     <h1>Welcome to Twitter Clone!</h1>
     <p>You will not see any tweets until you log in.</p>
