@@ -12,7 +12,7 @@
                     {% if person.pk != user.pk %}
                         <h5><a href="{% url 'user_detail' person.pk %}" class="card-title">{{ person.username }}</a></h5>
                     {% else %}
-                        <h5><a href="{% url 'myProfile_detail' person.pk %}" class="card-title">{{ person.username }}</a></h5>
+                        <h5><a href="{% url 'my_profile_detail' %}" class="card-title">{{ person.username }}</a></h5>
                     {% endif %}
                 </div>
             </div>

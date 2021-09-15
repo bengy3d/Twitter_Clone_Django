@@ -84,11 +84,11 @@ class TestTweetsAndComments(TestCase):
         
     def test_tweet_list_my_profile_for_logged_in_user(self):
         self.client.login(username='usertest', password='testpass123')
-        response = self.client.get(reverse('myProfile_detail', args=[str(self.user.pk)]))
+        response = self.client.get(reverse('my_profile_detail', args=[str(self.user.pk)]))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Usertest')
         self.assertContains(response, 'First tweet')
-        self.assertTemplateUsed(response, 'pages/myProfile_detail.html')
+        self.assertTemplateUsed(response, 'pages/my_profile_detail.html')
         
 class TestUserFollowing(TestCase):
     

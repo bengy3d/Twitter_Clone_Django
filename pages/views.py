@@ -9,8 +9,9 @@ from django.contrib.auth import get_user_model
 from django.db.models import Q
 from django.urls import reverse, reverse_lazy
 from django.http import HttpResponseRedirect, Http404
+from django.views.generic.edit import CreateView
 
-from tweets.models import Tweet, UserFollowing
+from tweets.models import Tweet, UserFollowing, Comment
 from .forms import CommentForm, TweetForm, FollowForm
 
 userModel = get_user_model()
@@ -79,6 +80,28 @@ class TweetListView(View):
         view = TweetFormView.as_view()
         return view(request, *args, **kwargs)
     
+class ExploreDisplay(TweetListDisplay):
+    template_name = 'pages/explore.html'
+    
+    def get_queryset(self):
+        return Tweet.objects.all()
+
+class ExploreFormView(TweetFormView):
+    template_name = 'pages/explore.html'
+    
+    def get_success_url(self):
+        return reverse('explore')
+    
+class ExploreListView(View):
+    
+    def get(self, request, *args, **kwargs):
+        view = ExploreDisplay.as_view()
+        return view(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        view = ExploreFormView.as_view()
+        return view(request, *args, **kwargs)
+
 # Tweet detail Views
 # GET
 class TweetDisplay(DetailView):
@@ -93,6 +116,13 @@ class TweetDisplay(DetailView):
         if self.object in my_profile.tweet_likes.all():
             liked = True
         context['liked'] = liked
+        is_liked = {}
+        for comment in self.object.comments.all():
+            if comment in my_profile.comment_likes.all():
+                is_liked[comment.pk] = True
+            else:
+                is_liked[comment.pk] = False
+        context['is_liked'] = is_liked
         context['form'] = CommentForm()
         return context
 # POST    
@@ -130,6 +160,20 @@ class TweetDetailView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         view = TweetComment.as_view()
         return view(request, *args, **kwargs)
+    
+class TweetCreateView(LoginRequiredMixin, CreateView):
+    model = Tweet
+    template_name = 'pages/tweet_create.html'
+    form_class = TweetForm
+    
+    def form_valid(self, form):
+        tweet = form.save(commit=False)
+        tweet.author = self.request.user
+        tweet.save()
+        return super().form_valid(form)
+    
+    def get_success_url(self):
+        return reverse('home')
 
 class TweetDeleteView(LoginRequiredMixin, DeleteView):
     model = Tweet
@@ -313,3 +357,15 @@ def unlike_tweet(request, pk):
     next = request.POST.get('next', '/')
     tweet.likes.remove(request.user)
     return HttpResponseRedirect(next + f'#{tweet.pk}') 
+
+def like_comment(request, pk):
+    comment = get_object_or_404(Comment, id=request.POST.get('comment_id'))
+    next = request.POST.get('next', '/')
+    comment.likes.add(request.user)
+    return HttpResponseRedirect(next + f'#{comment.pk}')
+
+def unlike_comment(request, pk):
+    comment = get_object_or_404(Comment, id=request.POST.get('comment_id'))
+    next = request.POST.get('next', '/')
+    comment.likes.remove(request.user)
+    return HttpResponseRedirect(next + f'#{comment.pk}')

@@ -17,7 +17,7 @@
 {% endif %}
 
 {% for tweet in person.tweets.all reversed %}
-    <div class="card text-black mt-3" id="{{ tweet.pk }}" style="background-color: #DCDEE0">
+    <div class="card text-white mt-3" id="{{ tweet.pk }}">
         <div class="card-header">
             {{ tweet.date | timesince }} ago 
             <a class="link-danger" href="{% url 'tweet_delete' tweet.pk %}">Delete</a>

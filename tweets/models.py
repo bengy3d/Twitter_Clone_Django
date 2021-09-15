@@ -27,6 +27,11 @@ class Tweet(models.Model):
         return reverse('tweet_detail', args=[str(self.pk)])
     
 class Comment(models.Model):
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False
+    )
     tweet = models.ForeignKey(
         Tweet,
         related_name='comments',
@@ -37,12 +42,18 @@ class Comment(models.Model):
         userModel,
         on_delete=models.CASCADE
     )
+    likes = models.ManyToManyField(userModel, related_name='comment_likes')
     date = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
         return self.comment
 
 class UserFollowing(models.Model):
+    id = models.UUIDField(
+        primary_key=True,
+        default=uuid.uuid4,
+        editable=False
+    )
     user_id = models.ForeignKey(
         userModel,
         related_name='following',

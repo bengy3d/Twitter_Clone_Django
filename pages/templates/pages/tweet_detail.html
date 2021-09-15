@@ -5,7 +5,7 @@
 
 {% block content %}
 <h2>Tweet</h2>
-<div class="card text-black mt-2" style="background-color: #DCDEE0">
+<div class="card text-white mt-2">
     <div class="card-header">
         {% if tweet.author != user%}
             <a href="{% url 'user_detail' tweet.author.pk %}">{{ tweet.author }}</a> | {{ tweet.date | timesince }} ago
@@ -44,12 +44,30 @@
     <p>This tweet doesn't have any comments yet.</p>
 {% endif %}
 {% for comment in tweet.comments.all reversed %}
-    <div class="card text-white bg-secondary mt-2">
+    <div class="card text-white mt-2" id="{{ comment.pk }}">
         <div class="card-header">
             {{ comment.author }} | {{ comment.date }}
         </div>
         <div class="card-body">
             <p>{{ comment.comment }}</p>
+        </div>
+        <div class="card-footer">
+            <p>Likes: {{ comment.likes.all.count }}</p>
+            {% for key, value in is_liked.items %}
+                {% if key == comment.pk and value %}
+                    <form class="d-inline-block" action="{% url 'unlike_comment' comment.pk %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{{ request.path }}">
+                        <button class="btn btn-danger" style="border-radius: 25px" name="comment_id" value="{{ comment.id }}" type="submit">Unlike</button>
+                    </form>
+                {% elif key == comment.pk and not value %}
+                    <form class="d-inline-block" action="{% url 'like_comment' comment.pk %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{{ request.path }}">
+                        <button class="btn btn-primary" style="border-radius: 25px" name="comment_id" value="{{ comment.id }}" type="submit">Like</button>
+                    </form>
+                {% endif %}
+            {% endfor %}
         </div>
     </div>
 {% endfor %}

@@ -15,7 +15,7 @@
 <hr>
 {% if person.tweets.all %}
     {% for tweet in person.tweets.all reversed %}
-        <div class="card text-black mt-3" style="background-color: #DCDEE0">
+        <div class="card text-grey mt-3">
             <div class="card-header">
                 {{ tweet.date | timesince }} ago
             </div>

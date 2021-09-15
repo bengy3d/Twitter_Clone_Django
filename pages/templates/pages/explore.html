@@ -1,7 +1,7 @@
 {% extends 'pages/_base.html' %}
 {% load crispy_forms_tags %}
 
-{% block title %}Home{% endblock title %}
+{% block title %}Explore{% endblock title %}
 
 {% block content %}
 <form class="mt-4" action="" method="post">
@@ -9,15 +9,9 @@
     {{ form|crispy }}
     <button class="btn btn-primary mt-2" style="border-radius: 25px" type="submit">Tweet</button>
 </form>
-<h2 class="mt-4">Followed tweets</h2>
-{% if not user.following.all %}
-    <p>You're not following anybody, use the search bar to find your friends or click explore.</p>
-    {% if user.tweets.all %}
-        <p>Only displaying your posts.</p>
-    {% endif %}
-{% endif %}
+<h2 class="mt-4">All Tweets</h2>
 {% for tweet in object_list reversed %}
-    <div class="card text-white mt-3" id="{{ tweet.pk }}">
+    <div class="card text-grey mt-3" id="{{ tweet.pk }}">
         <div class="card-header">
             {% if tweet.author != user%}
                 <a href="{% url 'user_detail' tweet.author.pk %}">{{ tweet.author }}</a> | {{ tweet.date | timesince }} ago
