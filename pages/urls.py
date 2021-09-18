@@ -2,6 +2,7 @@ from django.urls import path
 
 from .views import (
     LandingPageView,
+    LoginTemplateView,
     ExploreListView,
     MyProfileDetailView,
     SearchResultsListView, 
@@ -20,6 +21,7 @@ from .views import (
 
 urlpatterns = [
     path('', LandingPageView.as_view(), name='landing'),
+    path('login/', LoginTemplateView.as_view(), name='login'),
     path('home/', TweetListView.as_view(), name='home'),
     path('explore/', ExploreListView.as_view(), name='explore'),
     path('search/', SearchResultsListView.as_view(), name='search_results'),

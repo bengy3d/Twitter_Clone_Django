@@ -3,15 +3,18 @@
 {% block title %}{{ person.username | title }}{% endblock title %}
 
 {% block content %}
-<h1>{{ person.username | title }}</h1>
+<div class="d-flex bd-highlight">
+<h1 class="p-2 flex-grow-1 bd-highlight">{{ person.username | title }}</h1>
 {% if follow %}
-    <form method="post">
+    <form class="p-2 bd-highlight" method="post">
         {% csrf_token %}
         <button class="btn btn-primary" style="border-radius: 25px" type="submit">Follow</button>
     </form>
 {% else %}
     <a class="btn btn-danger" style="border-radius: 25px" href="{% url 'user_unfollow' person.pk %}">Unfollow</a>
 {% endif %}
+</div>
+&nbsp;&nbsp;<img class="img-thumbnail" src="{{ person.socialaccount_set.all.0.get_avatar_url }}" />
 <hr>
 {% if person.tweets.all %}
     {% for tweet in person.tweets.all reversed %}

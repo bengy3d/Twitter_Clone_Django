@@ -5,6 +5,7 @@
 
 {% block content %}
 <h1>{{ person.username | title }}</h1>
+<img class="img-thumbnail" src="{{ user.socialaccount_set.all.0.get_avatar_url }}" />
 <hr>
 <form class="mt-3" method="post">
     {% csrf_token %}

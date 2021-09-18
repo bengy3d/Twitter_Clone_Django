@@ -1,0 +1,15 @@
+{% extends 'pages/_base.html' %}
+
+{% load socialaccount %}
+{% load static %}
+
+{% block title %}Log In{% endblock title %}
+
+{% block landing_pages %}
+<div class="text-center mt-5">
+    <h3>We have detected that you're trying to access content available only for logged
+        in users.<br/>Please log in using google.</h1>
+    <img class="w-50 mt-3" src="{% static 'pages/images/google_logo.png' %}">
+    <p><a class="btn btn-primary me-2" href="{% provider_login_url 'google' %}">Log In with Google</a></p>
+</div>
+{% endblock landing_pages %}

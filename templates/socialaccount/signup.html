@@ -1,0 +1,15 @@
+{% extends 'pages/_base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Sign up{% endblock title %}
+
+{% block content %}
+<h1>Sign Up</h1>
+<p>You are about to use your {{provider_name}} account to login to
+{{site_name}}. As a final step, please complete the following form:</p>
+<form method="post" action="{% url 'socialaccount_signup' %}">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <button class="btn btn-success" type="submit">Sign Up</button>
+</form>
+{% endblock content %}

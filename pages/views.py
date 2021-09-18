@@ -5,7 +5,7 @@ from django.views.generic import (
 )
 from django.views import View
 from django.views.generic.detail import SingleObjectMixin
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, login
 from django.db.models import Q
 from django.urls import reverse, reverse_lazy
 from django.http import HttpResponseRedirect, Http404
@@ -25,9 +25,13 @@ class LandingPageView(TemplateView):
         if self.request.user.is_authenticated:
             return HttpResponseRedirect(reverse('home'))
         return super().get(request, *args, **kwargs)
+    
+class LoginTemplateView(LandingPageView):
+    template_name = 'pages/login.html'
+    
 # Homepage View
 # GET
-class TweetListDisplay(LoginRequiredMixin, ListView):
+class TweetListDisplay(ListView):
     model = Tweet
     context_object_name = 'tweet'
     template_name = 'pages/home.html'
@@ -70,7 +74,9 @@ class TweetFormView(FormView):
     def get_success_url(self):
         return reverse('home') + '#new_post'
     
-class TweetListView(View):
+class TweetListView(LoginRequiredMixin, View):
+
+    login_url = 'login'
 
     def get(self, request, *args, **kwargs):
         view = TweetListDisplay.as_view()
@@ -92,7 +98,9 @@ class ExploreFormView(TweetFormView):
     def get_success_url(self):
         return reverse('explore')
     
-class ExploreListView(View):
+class ExploreListView(LoginRequiredMixin, View):
+    
+    login_url = 'login'
     
     def get(self, request, *args, **kwargs):
         view = ExploreDisplay.as_view()
@@ -152,6 +160,8 @@ class TweetComment(SingleObjectMixin, FormView):
         return reverse('tweet_detail', kwargs={'pk': post.pk}) + '#comments'
     
 class TweetDetailView(LoginRequiredMixin, View):
+    
+    login_url = 'login'
 
     def get(self, request, *args, **kwargs):
         view = TweetDisplay.as_view()
@@ -165,6 +175,7 @@ class TweetCreateView(LoginRequiredMixin, CreateView):
     model = Tweet
     template_name = 'pages/tweet_create.html'
     form_class = TweetForm
+    login_url = 'login'
     
     def form_valid(self, form):
         tweet = form.save(commit=False)
@@ -179,6 +190,7 @@ class TweetDeleteView(LoginRequiredMixin, DeleteView):
     model = Tweet
     template_name = 'pages/tweet_delete.html'
     success_url = reverse_lazy('my_profile_detail')
+    login_url = 'login'
     
     def delete(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -193,7 +205,7 @@ class TweetDeleteView(LoginRequiredMixin, DeleteView):
 class SearchResultsListView(LoginRequiredMixin, ListView):
     model = userModel
     template_name = 'pages/search_results.html'
-    login_ulr = 'account_login'
+    login_url = 'login'
     
     def get_queryset(self):
         query = self.request.GET.get('q')
@@ -243,6 +255,7 @@ class MyProfileTweetFormView(FormView):
         return reverse('my_profile_detail') + '#new_post'
        
 class MyProfileDetailView(LoginRequiredMixin, DetailView):
+    login_url = 'login'
     
     def get(self, request, *args, **kwargs):
         view = MyProfileDisplay.as_view()
@@ -310,6 +323,8 @@ class UserFollowFormView(SingleObjectMixin, FormView):
        
 class UserDetailView(LoginRequiredMixin, DetailView):
     
+    login_url = 'login'
+    
     def get(self, request, *args, **kwargs):
         view = UserDisplay.as_view()
         return view(request, *args, **kwargs)
@@ -322,6 +337,7 @@ class UserUnfollowView(LoginRequiredMixin, FormView):
     model = UserFollowing
     form_class = FollowForm
     template_name = 'pages/user_unfollow.html'
+    login_url = 'login'
     
     def get_object(self, **kwargs):
         primaryKey = self.kwargs.get('pk')
