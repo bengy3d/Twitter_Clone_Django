@@ -16,7 +16,7 @@
     </div>
 {% endif %}
 </div>
-&nbsp;&nbsp;<img class="img-thumbnail" src="{{ person.socialaccount_set.all.0.get_avatar_url }}" />
+&nbsp;&nbsp;<img src="{{ person.socialaccount_set.all.0.get_avatar_url }}" />
 <hr>
 {% if person.tweets.all %}
     {% for tweet in person.tweets.all reversed %}
