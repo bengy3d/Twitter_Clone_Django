@@ -11,7 +11,9 @@
         <button class="btn btn-primary" style="border-radius: 25px" type="submit">Follow</button>
     </form>
 {% else %}
-    <a class="btn btn-danger" style="border-radius: 25px" href="{% url 'user_unfollow' person.pk %}">Unfollow</a>
+    <div class="p-2 bd-highlight">
+        <a class="btn btn-danger" style="border-radius: 25px" href="{% url 'user_unfollow' person.pk %}">Unfollow</a>
+    </div>
 {% endif %}
 </div>
 &nbsp;&nbsp;<img class="img-thumbnail" src="{{ person.socialaccount_set.all.0.get_avatar_url }}" />

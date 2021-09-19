@@ -157,7 +157,7 @@ class TweetComment(SingleObjectMixin, FormView):
         comment.author = self.request.user
         if comment.author != self.object.author:
             notify.send(sender=comment.author, recipient=comment.tweet.author, 
-                        action_object=comment.tweet, verb='Comment',
+                        action_object=comment.tweet, target=comment, verb='Comment',
                         description='commented on your tweet')
         comment.save()
         return super().form_valid(form)
@@ -322,6 +322,9 @@ class UserFollowFormView(SingleObjectMixin, FormView):
         follow = form.save(commit=False)
         follow.user_id = self.request.user
         follow.following_user_id = self.object
+        notify.send(sender=follow.user_id, recipient=follow.following_user_id, 
+                    action_object=follow.user_id, verb='user-follow',
+                    description='started following you')
         follow.save()
         return super().form_valid(form)
     
@@ -391,7 +394,7 @@ def like_comment(request, pk):
     next = request.POST.get('next', '/')
     if comment.author != request.user:
         notify.send(sender=request.user, recipient=comment.author, 
-                    action_object=comment.tweet, verb='comment-like',
+                    action_object=comment.tweet, target=comment, verb='comment-like',
                     description='liked your comment')
     comment.likes.add(request.user)
     return HttpResponseRedirect(next + f'#{comment.pk}')

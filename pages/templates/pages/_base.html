@@ -48,8 +48,8 @@
                     {% endblock content %}
                 </div>
                 <div class="col">
-                    <div class="btn-group">
-                        <button type="button" class="btn btn-primary position-relative dropdown-toggle mt-3" id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
+                    <div class="sticky-top btn-group">
+                        <button type="button" class="btn btn-primary position-relative dropdown-toggle" id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
                             Notifications
                             {% if unread_count %}
                                 <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle">
@@ -59,7 +59,13 @@
                         </button>
                         <ul class="dropdown-menu dropdown-menu-dark">
                             {% for notification in  user.notifications.unread %}
-                                <li><a class="btn dropdown-item" href="{% url 'notifications:mark_as_read' notification.slug %}?next={% url 'tweet_detail' notification.action_object.pk %}">{{ notification.actor }} {{ notification.description }}</a></li>
+                                {% if notification.verb == 'tweet-like' %}
+                                    <li><a class="btn dropdown-item" href="{% url 'notifications:mark_as_read' notification.slug %}?next={% url 'tweet_detail' notification.action_object.pk %}">{{ notification.actor }} {{ notification.description }}</a></li>
+                                {% elif notification.verb == 'user-follow' %}
+                                    <li><a class="btn dropdown-item" href="{% url 'notifications:mark_as_read' notification.slug %}?next={% url 'user_detail' notification.action_object.pk %}">{{ notification.actor }} {{ notification.description }}</a></li>
+                                {% else %}
+                                    <li><a class="btn dropdown-item" href="{% url 'notifications:mark_as_read' notification.slug %}?next={% url 'tweet_detail' notification.action_object.pk %}#{{ notification.target.pk }}">{{ notification.actor }} {{ notification.description }}</a></li>
+                                {% endif %}
                             {% endfor %}
                         </ul>
                     </div>
