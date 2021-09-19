@@ -9,13 +9,13 @@
         <div class="col">
             <div class="card">
                 <div class="card-header">
-                    <img class="img-thumbnail" src="{{ person.socialaccount_set.all.0.get_avatar_url }}" />
+                    <img src="{{ person.socialaccount_set.all.0.get_avatar_url }}" />
                 </div>
                 <div class="card-body">
                     {% if person.pk != user.pk %}
                         <a href="{% url 'user_detail' person.pk %}" class="card-title stretched-link">{{ person.username }}</a>
                     {% else %}
-                        <a href="{% url 'my_profile_detail' %}" class="card-title stretched-link"><img class="img-thumbnail" src="{{ person.socialaccount_set.all.0.get_avatar_url }}" />{{ person.username }}</a>
+                        <a href="{% url 'my_profile_detail' %}" class="card-title stretched-link">{{ person.username }}</a>
                     {% endif %}
                 </div>
             </div>

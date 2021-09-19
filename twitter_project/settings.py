@@ -133,6 +133,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'users.CustomUser'
 
+ACCOUNT_EMAIL_REQUIRED = True
+
 # django-allauth config
 SITE_ID = 1
 

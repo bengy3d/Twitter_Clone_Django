@@ -35,7 +35,7 @@
                 <div id="right_border" class="col min-vh-100">
                     <div class="sticky-top">
                         <div class="list-group">
-                            <h5 class="text-center">Hello {{ user.username | title }}!</h5>
+                            <h5 class="text-center">Hello <a href="{% url 'my_profile_detail' %}">{{ user.username | title }}!</a></h5>
                             <a href="{% url 'home' %}" class="btn btn-primary mt-3" style="border-radius:25px">Home</a>
                             <a href="{% url 'explore' %}" class="btn btn-primary mt-3" style="border-radius:25px">Explore</a>
                             <a href="{% url 'tweet_create' %}" class="btn btn-primary mt-3" style="border-radius:25px">Tweet</a>
