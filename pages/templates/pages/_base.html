@@ -9,7 +9,7 @@
         <link rel="stylesheet" type="text/css" href="{% static 'pages/_base.css' %}">
     </head>
     <body class="text-white">
-        <nav class="navbar sticky-top navbar-black bg-black">
+        <nav id="base-nav" class="navbar sticky-top navbar-black bg-black">
             <div class="container-fluid">
                 {% if user.is_authenticated %}
                     <a class="navbar-brand text-white" href="{% url 'home' %}">Twitter Clone</a>

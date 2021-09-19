@@ -35,6 +35,7 @@ class TweetListDisplay(ListView):
     model = Tweet
     context_object_name = 'tweet'
     template_name = 'pages/home.html'
+    paginate_by = 20
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -206,6 +207,7 @@ class SearchResultsListView(LoginRequiredMixin, ListView):
     model = userModel
     template_name = 'pages/search_results.html'
     login_url = 'login'
+    paginate_by = 10
     
     def get_queryset(self):
         query = self.request.GET.get('q')
