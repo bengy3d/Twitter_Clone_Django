@@ -11,6 +11,8 @@ from django.urls import reverse, reverse_lazy
 from django.http import HttpResponseRedirect, Http404
 from django.views.generic.edit import CreateView
 
+from notifications.signals import notify
+
 from tweets.models import Tweet, UserFollowing, Comment
 from .forms import CommentForm, TweetForm, FollowForm
 
@@ -153,6 +155,10 @@ class TweetComment(SingleObjectMixin, FormView):
         comment = form.save(commit=False)
         comment.tweet = self.object
         comment.author = self.request.user
+        if comment.author != self.object.author:
+            notify.send(sender=comment.author, recipient=comment.tweet.author, 
+                        action_object=comment.tweet, verb='Comment',
+                        description='commented on your tweet')
         comment.save()
         return super().form_valid(form)
 
@@ -367,6 +373,10 @@ class UserUnfollowView(LoginRequiredMixin, FormView):
 def like_tweet(request, pk):
     tweet = get_object_or_404(Tweet, id=request.POST.get('tweet_id'))
     next = request.POST.get('next', '/')
+    if tweet.author != request.user:
+        notify.send(sender=request.user, recipient=tweet.author, 
+                    action_object=tweet, verb='tweet-like',
+                    description='liked your tweet')
     tweet.likes.add(request.user)
     return HttpResponseRedirect(next + f'#{tweet.pk}')
 
@@ -379,6 +389,10 @@ def unlike_tweet(request, pk):
 def like_comment(request, pk):
     comment = get_object_or_404(Comment, id=request.POST.get('comment_id'))
     next = request.POST.get('next', '/')
+    if comment.author != request.user:
+        notify.send(sender=request.user, recipient=comment.author, 
+                    action_object=comment.tweet, verb='comment-like',
+                    description='liked your comment')
     comment.likes.add(request.user)
     return HttpResponseRedirect(next + f'#{comment.pk}')
 

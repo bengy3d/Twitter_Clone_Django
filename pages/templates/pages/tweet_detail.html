@@ -46,7 +46,11 @@
 {% for comment in tweet.comments.all reversed %}
     <div class="card text-white mt-2" id="{{ comment.pk }}">
         <div class="card-header">
-            {{ comment.author }} | {{ comment.date }}
+            {% if comment.author != user %}
+                <a href="{% url 'user_detail' comment.author.pk %}">{{ comment.author }}</a> | {{ comment.date | timesince }} ago
+            {% else %}
+                <a href="{% url 'my_profile_detail'%}">{{ comment.author }}</a> | {{ comment.date | timesince }} ago
+            {% endif %}
         </div>
         <div class="card-body">
             <p>{{ comment.comment }}</p>

@@ -15,12 +15,16 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf.urls import url
+import notifications.urls
 
 urlpatterns = [
     path('this-is-not-admin/', admin.site.urls),
     # User manager
     path('accounts/', include('users.urls')),
     path('accounts/', include('allauth.urls')),
+    # Notifications
+    url('^inbox/notifications/', include(notifications.urls, namespace='notifications')),
     # Local apps
     path('', include('pages.urls')),
 ]

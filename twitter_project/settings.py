@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     
     # THIRD-PARTY
     'crispy_forms',
+    'notifications',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
