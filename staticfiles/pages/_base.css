@@ -1,0 +1,42 @@
+body {
+    background-color: black;
+}
+
+input {
+    color: white;
+    background-color: black;
+}
+
+div.sticky-top {
+    top: 5em;
+}
+
+.btn-primary {
+    background-color: #2F9BFD;
+    border-style: none;
+}
+
+#right_border {
+    border-right: 1px solid grey;
+}
+
+#base-nav {
+    border-bottom: 1px solid grey;
+}
+
+.card {
+    background-color: black;
+    border-color: grey;
+}
+
+.card-header {
+    border-color: grey;
+}
+
+.card-footer {
+    border-color: grey;
+}
+
+a {
+    text-decoration: none;
+}
