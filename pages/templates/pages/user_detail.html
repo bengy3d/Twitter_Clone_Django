@@ -18,8 +18,8 @@
 </div>
 &nbsp;&nbsp;<img src="{{ person.socialaccount_set.all.0.get_avatar_url }}" />
 <div class="d-flex bd-highlight">
-    <p class="p-2 flex-grow-1 bd-highlight"><b>Followers: {{ person.followers.all.count }}</b></p>
-    <p class="p-2 bd-highlight"><b>Following: {{ person.following.all.count }}</b>
+    <p class="p-2 flex-grow-1 bd-highlight"><b>Followers: <a href="{% url 'followers_list' person.pk %}">{{ person.followers.all.count }}</a></b></p>
+    <p class="p-2 bd-highlight"><b>Following: <a href="{% url 'following_list' person.pk %}">{{ person.following.all.count }}</a></b>
 </div>
 <hr>
 {% if person.tweets.all %}

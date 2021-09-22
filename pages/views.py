@@ -373,6 +373,57 @@ class UserUnfollowView(LoginRequiredMixin, FormView):
         view_user = self.get_object()
         return reverse('user_detail', kwargs={'pk': view_user.pk})
     
+class FollowersListView(LoginRequiredMixin, ListView):
+    model = UserFollowing
+    template_name = 'pages/followers_list.html'
+    login_url = 'login'
+    
+    def get_object(self, **kwargs):
+        primaryKey = self.kwargs.get('pk')
+        view_user = userModel.objects.get(pk=primaryKey)
+        return view_user
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        view_user = self.get_object()
+        context['person'] = view_user
+        return context
+    
+    def get_queryset(self):
+        view_user = self.get_object()
+        return UserFollowing.objects.filter(
+            Q(following_user_id=view_user)
+        )
+        
+    def get_success_url(self):
+        view_user = self.get_object()
+        return reverse('user_detail', kwargs={'pk': view_user.pk})
+    
+class FollowingListView(FollowersListView):
+    template_name = 'pages/following_list.html'
+    
+    def get_queryset(self):
+        view_user = self.get_object()
+        return UserFollowing.objects.filter(
+            Q(user_id=view_user)
+        )
+        
+class MyProfileFollowersList(FollowersListView):
+    
+    def get_object(self):
+        return self.request.user
+    
+    def get_success_url(self):
+        return reverse('my_profile_detail')
+    
+class MyProfileFollowingList(FollowingListView):
+    
+    def get_object(self):
+        return self.request.user
+    
+    def get_success_url(self):
+        return reverse('my_profile_detail')
+    
 def like_tweet(request, pk):
     tweet = get_object_or_404(Tweet, id=request.POST.get('tweet_id'))
     next = request.POST.get('next', '/')
