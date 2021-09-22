@@ -442,8 +442,8 @@ def unlike_tweet(request, pk):
     tweet.likes.remove(request.user)
     return HttpResponseRedirect(next + f'#{tweet.pk}')
 
-class LikeList(LoginRequiredMixin, DetailView):
-    template_name = 'pages/likes_list.html'
+class TweetLikeList(LoginRequiredMixin, DetailView):
+    template_name = 'pages/tweet_likes_list.html'
     model = Tweet
     context_object_name = 'tweet'
 
@@ -456,6 +456,11 @@ def like_comment(request, pk):
                     description='liked your comment')
     comment.likes.add(request.user)
     return HttpResponseRedirect(next + f'#{comment.pk}')
+
+class CommentLikeList(LoginRequiredMixin, DetailView):
+    model = Comment
+    template_name = 'pages/comment_likes_list.html'
+    context_object_name = 'comment'
 
 def unlike_comment(request, pk):
     comment = get_object_or_404(Comment, id=request.POST.get('comment_id'))

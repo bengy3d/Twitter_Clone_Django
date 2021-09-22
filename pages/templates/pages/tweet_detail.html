@@ -18,7 +18,7 @@
         <p>{{ tweet.content }}</p>
     </div>
     <div class="card-footer">
-        <p>Likes: <a href="{% url 'likes_list' tweet.pk %}">{{ tweet.likes.all.count }}</a></p>
+        <p>Likes: <a href="{% url 'tweet_likes_list' tweet.pk %}">{{ tweet.likes.all.count }}</a></p>
         {% if liked %}
             <form class="d-inline-block" action="{% url 'unlike_tweet' tweet.pk %}" method="post">
                 {% csrf_token %}
@@ -56,7 +56,7 @@
             <p>{{ comment.comment }}</p>
         </div>
         <div class="card-footer">
-            <p>Likes: {{ comment.likes.all.count }}</p>
+            <p>Likes: <a href="{% url 'comment_likes_list' comment.pk %}">{{ comment.likes.all.count }}</a></p>
             {% for key, value in is_liked.items %}
                 {% if key == comment.pk and value %}
                     <form class="d-inline-block" action="{% url 'unlike_comment' comment.pk %}" method="post">

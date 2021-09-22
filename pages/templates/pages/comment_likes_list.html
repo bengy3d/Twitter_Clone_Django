@@ -1,0 +1,28 @@
+{% extends 'pages/_base.html' %}
+
+{% block title %}{{ comment.author | title }}'s comment likes{% endblock title %}
+
+
+{% block content %}
+<h1>{{ comment.author | title }}'s comment likes</h1>
+<div class="row row-cols-1 row-cols-md-2 g-4">
+    {% for like in comment.likes.all %}
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    <img src="{{ like.socialaccount_set.all.0.get_avatar_url }}" />
+                </div>
+                <div class="card-body">
+                    {% if like.pk != user.pk %}
+                        <a href="{% url 'user_detail' like.pk %}" class="card-title stretched-link">{{ like.username }}</a>
+                    {% else %}
+                        <a href="{% url 'my_profile_detail' %}" class="card-title stretched-link">{{ like.username }}</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <p>This comment has no likes</p>
+    {% endfor %}
+</div>
+{% endblock content %}
