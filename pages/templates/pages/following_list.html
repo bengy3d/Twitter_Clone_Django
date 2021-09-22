@@ -1,0 +1,27 @@
+{% extends 'pages/_base.html' %}
+
+{% block title %}{{ person.username | title }}'s following{% endblock title %}
+
+{% block content %}
+<h1>{{ person.username | title }}'s following</h1>
+<div class="row row-cols-1 row-cols-md-2 g-4">
+    {% for follow in object_list %}
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    <img src="{{ follow.following_user_id.socialaccount_set.all.0.get_avatar_url }}" />
+                </div>
+                <div class="card-body">
+                    {% if follow.following_user_id.pk != user.pk %}
+                        <a href="{% url 'user_detail' follow.following_user_id.pk %}" class="card-title stretched-link">{{ follow.following_user_id.username }}</a>
+                    {% else %}
+                        <a href="{% url 'my_profile_detail'%}" class="card-title stretched-link">{{ follow.following_user_id.username }}</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <p>This user doesn't follow anybody.</p>
+    {% endfor %}
+</div>
+{% endblock content %}

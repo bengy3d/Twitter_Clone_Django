@@ -373,6 +373,59 @@ class UserUnfollowView(LoginRequiredMixin, FormView):
         view_user = self.get_object()
         return reverse('user_detail', kwargs={'pk': view_user.pk})
     
+    
+class FollowingListView(LoginRequiredMixin, ListView):
+    model = UserFollowing
+    template_name = 'pages/following_list.html'
+    login_url = 'login'
+    
+    def get_object(self, **kwargs):
+        primaryKey = self.kwargs.get('pk')
+        view_user = userModel.objects.get(pk=primaryKey)
+        return view_user
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        view_user = self.get_object()
+        context['person'] = view_user
+        return context
+    
+    def get_queryset(self):
+        view_user = self.get_object()
+        return UserFollowing.objects.filter(
+            Q(user_id=view_user)
+        )
+        
+    def get_success_url(self):
+        view_user = self.get_object()
+        return reverse('user_detail', kwargs={'pk': view_user.pk})
+    
+class FollowersListView(FollowingListView):
+    template_name = 'pages/followers_list.html'
+    
+    def get_queryset(self):
+        view_user = self.get_object()
+        return UserFollowing.objects.filter(
+            Q(following_user_id=view_user)
+        )
+        
+class MyProfileFollowingsList(FollowingListView):
+    
+    def get_object(self):
+        return self.request.user
+    
+    def get_success_url(self):
+        return reverse('my_profile_detail')
+    
+class MyProfileFollowersList(FollowersListView):
+    
+    def get_object(self):
+        return self.request.user
+    
+    def get_success_url(self):
+        return reverse('my_profile_detail')
+    
+    
 def like_tweet(request, pk):
     tweet = get_object_or_404(Tweet, id=request.POST.get('tweet_id'))
     next = request.POST.get('next', '/')
@@ -387,7 +440,12 @@ def unlike_tweet(request, pk):
     tweet = get_object_or_404(Tweet, id=request.POST.get('tweet_id'))
     next = request.POST.get('next', '/')
     tweet.likes.remove(request.user)
-    return HttpResponseRedirect(next + f'#{tweet.pk}') 
+    return HttpResponseRedirect(next + f'#{tweet.pk}')
+
+class LikeList(LoginRequiredMixin, DetailView):
+    template_name = 'pages/likes_list.html'
+    model = Tweet
+    context_object_name = 'tweet'
 
 def like_comment(request, pk):
     comment = get_object_or_404(Comment, id=request.POST.get('comment_id'))
