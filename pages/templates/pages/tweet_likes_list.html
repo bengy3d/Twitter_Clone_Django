@@ -4,7 +4,38 @@
 
 
 {% block content %}
-<h1>{{ tweet.author | title }}'s tweet likes</h1>
+<h2>Tweet</h2>
+<div class="card text-white mt-2">
+    <div class="card-header">
+        {% if tweet.author != user%}
+            <a href="{% url 'user_detail' tweet.author.pk %}">{{ tweet.author }}</a> | {{ tweet.date | timesince }} ago
+        {% else %}
+            <a href="{% url 'my_profile_detail'%}">{{ tweet.author }}</a> | {{ tweet.date | timesince }} ago
+            <a class="link-danger" href="{% url 'tweet_delete' tweet.pk %}">Delete</a>
+        {% endif %}
+    </div>
+    <div class="card-body">
+        <p>{{ tweet.content }}</p>
+    </div>
+    <div class="card-footer">
+        <p>Likes: <a href="{% url 'tweet_likes_list' tweet.pk %}">{{ tweet.likes.all.count }}</a></p>
+        {% if liked %}
+            <form class="d-inline-block" action="{% url 'unlike_tweet' tweet.pk %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.path }}">
+                <button class="btn btn-danger" style="border-radius: 25px" name="tweet_id" value="{{ tweet.id }}" type="submit">Unlike</button>
+            </form>
+        {% else %}
+            <form class="d-inline-block" action="{% url 'like_tweet' tweet.pk %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.path }}">
+                <button class="btn btn-primary" style="border-radius: 25px" name="tweet_id" value="{{ tweet.id }}" type="submit">Like</button>
+            </form>
+        {% endif %}
+        <a class="btn btn-primary" style="border-radius: 25px" href="{% url 'tweet_detail' tweet.pk %}">See comments</a>
+    </div>
+</div>
+<h4 class="mt-2">Likes</h4>
 <div class="row row-cols-1 row-cols-md-2 g-4">
     {% for like in tweet.likes.all %}
         <div class="col">

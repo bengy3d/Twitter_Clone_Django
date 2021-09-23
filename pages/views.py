@@ -446,6 +446,15 @@ class TweetLikeList(LoginRequiredMixin, DetailView):
     template_name = 'pages/tweet_likes_list.html'
     model = Tweet
     context_object_name = 'tweet'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        my_profile = userModel.objects.get(username=self.request.user)
+        liked = False
+        if self.object in my_profile.tweet_likes.all():
+            liked = True
+        context['liked'] = liked
+        return context
 
 def like_comment(request, pk):
     comment = get_object_or_404(Comment, id=request.POST.get('comment_id'))
@@ -461,6 +470,15 @@ class CommentLikeList(LoginRequiredMixin, DetailView):
     model = Comment
     template_name = 'pages/comment_likes_list.html'
     context_object_name = 'comment'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        my_profile = userModel.objects.get(username=self.request.user)
+        liked = False
+        if self.object in my_profile.comment_likes.all():
+            liked = True
+        context['liked'] = liked
+        return context
 
 def unlike_comment(request, pk):
     comment = get_object_or_404(Comment, id=request.POST.get('comment_id'))
