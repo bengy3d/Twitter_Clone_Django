@@ -45,9 +45,10 @@ class TestTweetsAndComments(TestCase):
     def test_tweet_list_homepage_for_logged_out_user(self):
         self.client.logout()
         response = self.client.get(reverse('home'))
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Welcome to Twitter Clone!')
-        self.assertTemplateUsed(response, 'pages/home.html')
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '%s?next=%s' % (reverse('login'), reverse('home')))
+        response = self.client.get('%s?next=%s' % (reverse('login'), reverse('home')))
+        self.assertContains(response, 'Log In')
         
     def test_tweet_detail_view_for_logged_in_user(self):
         self.client.login(username='usertest', password='testpass123')
@@ -62,8 +63,8 @@ class TestTweetsAndComments(TestCase):
         self.client.logout()
         response = self.client.get(self.tweet.get_absolute_url())
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, '%s?next=%s' % (reverse('account_login'), self.tweet.get_absolute_url()))
-        response = self.client.get('%s?next=%s' % (reverse('account_login'), self.tweet.get_absolute_url()))
+        self.assertRedirects(response, '%s?next=%s' % (reverse('login'), self.tweet.get_absolute_url()))
+        response = self.client.get('%s?next=%s' % (reverse('login'), self.tweet.get_absolute_url()))
         self.assertContains(response, 'Log In')
         
     def test_tweet_list_user_detail_for_logged_in_user(self):
@@ -78,13 +79,13 @@ class TestTweetsAndComments(TestCase):
         self.client.logout()
         response = self.client.get(reverse('user_detail', args=[str(self.secondUser.pk)]))
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, '%s?next=%s' % (reverse('account_login'), reverse('user_detail', args=[str(self.secondUser.pk)])))
-        response = self.client.get('%s?next=%s' % (reverse('account_login'), reverse('user_detail', args=[str(self.secondUser.pk)])))
+        self.assertRedirects(response, '%s?next=%s' % (reverse('login'), reverse('user_detail', args=[str(self.secondUser.pk)])))
+        response = self.client.get('%s?next=%s' % (reverse('login'), reverse('user_detail', args=[str(self.secondUser.pk)])))
         self.assertContains(response, 'Log In')
         
     def test_tweet_list_my_profile_for_logged_in_user(self):
         self.client.login(username='usertest', password='testpass123')
-        response = self.client.get(reverse('my_profile_detail', args=[str(self.user.pk)]))
+        response = self.client.get(reverse('my_profile_detail'))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Usertest')
         self.assertContains(response, 'First tweet')
