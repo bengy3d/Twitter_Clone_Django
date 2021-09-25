@@ -8,7 +8,7 @@ from django.views.generic.detail import SingleObjectMixin
 from django.contrib.auth import get_user_model, login
 from django.db.models import Q
 from django.urls import reverse, reverse_lazy
-from django.http import HttpResponseRedirect, Http404, request
+from django.http import HttpResponseRedirect, Http404
 from django.views.generic.edit import CreateView
 
 from notifications.signals import notify

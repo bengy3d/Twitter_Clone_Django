@@ -19,7 +19,7 @@ class CommentForm(ModelForm):
 class TweetForm(ModelForm):
     class Meta:
         model = Tweet
-        fields = ['content', 'image']
+        fields = ['content']
         widgets = {
             'content': forms.TextInput(
                 attrs={'placeholder': 'What\'s on your mind?'}),
