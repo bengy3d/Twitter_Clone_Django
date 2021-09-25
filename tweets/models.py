@@ -12,6 +12,8 @@ class Tweet(models.Model):
         editable=False
     )
     content = models.CharField(max_length=255, verbose_name='')
+    image = models.ImageField(null=True, blank=True, upload_to='images/',
+                              verbose_name='Add an image')
     author = models.ForeignKey(
         userModel,
         related_name='tweets',

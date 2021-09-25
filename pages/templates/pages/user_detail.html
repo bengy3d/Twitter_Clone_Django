@@ -29,6 +29,10 @@
                 {{ tweet.date | timesince }} ago
             </div>
             <div class="card-body">
+                {% if tweet.image %}
+                    <img class="img-fluid" src="{{ tweet.image.url }}">
+                    <hr>
+                {% endif %}
                 <p>{{ tweet.content }}</p>
             </div>
             <div class="card-footer">
